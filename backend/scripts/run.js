@@ -2,6 +2,9 @@
 // ? Every time you run a terminal command that starts with npx hardhat you are getting this hre object built on the fly using the hardhat.config.js specified in your code!
 
 const main = async () => {
+    // Here I grabbed the wallet address of contract owner and I also grabbed a random wallet address and called it randomPerson
+    const [owner, randomPerson] = await hre.ethers.getSigners();
+
     /* This will actually compile our contract and generate 
     the necessary files we need to work with our contract 
     under the artifacts directory */
@@ -15,6 +18,23 @@ const main = async () => {
 
     // This will basically give us the address of the deployed contract
     console.log('Contract deployed to: ', waveContract.address);
+
+    // To see the address of the person deploying our contract
+    console.log('Contract deployed by: ', owner.address);
+
+    // First I call the function to grab the # of total waves. Then, I do the wave
+    let waveCount = await waveContract.getTotalWaves();
+    let waveTxn = await waveContract.wave();
+
+    await waveTxn.wait();
+
+    waveCount = await waveContract.getTotalWaves();
+
+    // Connecting a random person to my API
+    waveTxn = await waveContract.connect(randomPerson).wave();
+    await waveTxn.wait();
+
+    waveCount = await waveContract.getTotalWaves();
 }
 
 const runMain = async () => {
